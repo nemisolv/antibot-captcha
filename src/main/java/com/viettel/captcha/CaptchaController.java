@@ -15,7 +15,7 @@ public class CaptchaController {
 
     private final NaiveCaptchaService naiveCaptchaService;
 
-    public CaptchaController(@Qualifier("localCacheCleanupNaiveCaptchaServiceImpl") NaiveCaptchaService naiveCaptchaService) {
+    public CaptchaController(@Qualifier("kaptchaCaptchaServiceImpl") NaiveCaptchaService naiveCaptchaService) {
         this.naiveCaptchaService = naiveCaptchaService;
     }
 
@@ -32,14 +32,14 @@ public class CaptchaController {
             boolean success = naiveCaptchaService.verify(request);
 
             if (success) {
-                redirectAttributes.addFlashAttribute("message", "✅ Xác thực thành công");
+                redirectAttributes.addFlashAttribute("message", "Authenticated");
                 redirectAttributes.addFlashAttribute("success", true);
             } else {
-                redirectAttributes.addFlashAttribute("message", "❌ Captcha không đúng");
+                redirectAttributes.addFlashAttribute("message", "❌ Captcha is incorrect");
                 redirectAttributes.addFlashAttribute("success", false);
             }
         } catch (Exception e) {
-            redirectAttributes.addFlashAttribute("message", "⚠️ Captcha không khả dụng");
+            redirectAttributes.addFlashAttribute("message", "⚠ Captcha unavailable");
             redirectAttributes.addFlashAttribute("success", false);
         }
         return "redirect:/";

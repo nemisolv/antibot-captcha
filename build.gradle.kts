@@ -25,6 +25,7 @@ dependencies {
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
     developmentOnly ("org.springframework.boot:spring-boot-devtools")
     implementation("com.github.ben-manes.caffeine:caffeine:3.2.4")
+    implementation("com.github.penggle:kaptcha:2.3.2")
 }
 
 tasks.withType<Test> {
