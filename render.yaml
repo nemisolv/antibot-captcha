@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: captcha-demo
+    runtime: docker
+    plan: free
+    envVars:
+      - key: TURNSTILE_SITE_KEY
+        sync: false
+      - key: TURNSTILE_SECRET_KEY
+        sync: false
+      - key: RECAPTCHA_V3_SITE_KEY
+        sync: false
+      - key: RECAPTCHA_V3_SECRET_KEY
+        sync: false
+      - key: RECAPTCHA_V2_SITE_KEY
+        sync: false
+      - key: RECAPTCHA_V2_SECRET_KEY
+        sync: false

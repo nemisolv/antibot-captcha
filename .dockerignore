@@ -1,0 +1,9 @@
+.git
+.gradle
+.idea
+build/
+out/
+*.iml
+images/
+README.md
+src/main/resources/application-secrets.yaml

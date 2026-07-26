@@ -22,6 +22,24 @@ real keys and drop them into a git-ignored `src/main/resources/application-secre
 (see `application-secrets.yaml.example`) — Spring merges it on top of
 `application.yaml` via `spring.config.import`.
 
+## Deploying to Render
+
+The repo includes a `Dockerfile` and a `render.yaml` blueprint, so deployment
+is just:
+
+1. Push the repo to GitHub.
+2. On [Render](https://render.com), **New -> Blueprint**, point it at the repo.
+   Render reads `render.yaml` and provisions a free Docker web service.
+3. Render assigns the port at runtime; `application.yaml` already reads it via
+   `server.port: ${PORT:8087}`, so no change is needed.
+4. (Optional) In the service's **Environment** tab, set real
+   `TURNSTILE_SITE_KEY` / `TURNSTILE_SECRET_KEY` / `RECAPTCHA_V3_SITE_KEY` /
+   `RECAPTCHA_V3_SECRET_KEY` / `RECAPTCHA_V2_SITE_KEY` / `RECAPTCHA_V2_SECRET_KEY`
+   values. Leave them unset to keep using the public test key pairs.
+
+Note: the free plan spins the service down after ~15 minutes of inactivity,
+so the first request after idling takes 30-60s to cold start.
+
 ## The four tabs
 
 ### 1. Demo — classic distorted-text image CAPTCHA

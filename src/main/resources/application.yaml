@@ -1,5 +1,5 @@
 server:
-  port: 8087
+  port: ${PORT:8087}
   servlet:
     session:
       tracking-modes: cookie
@@ -11,16 +11,17 @@ spring:
 
   thymeleaf:
     cache: false
-# Default keys below are the public always-pass test pairs from Cloudflare/Google docs.
-# Real keys go in application-secrets.yaml (git-ignored), which overrides these locally.
+# Defaults are the public always-pass test pairs from Cloudflare/Google docs.
+# Override locally via application-secrets.yaml (git-ignored), or in production via
+# the env vars below (e.g. Render dashboard -> Environment).
 captcha:
   turnstile:
-    site-key: 1x00000000000000000000AA
-    secret-key: 1x0000000000000000000000000000000AA
+    site-key: ${TURNSTILE_SITE_KEY:1x00000000000000000000AA}
+    secret-key: ${TURNSTILE_SECRET_KEY:1x0000000000000000000000000000000AA}
   recaptcha:
-    site-key: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
-    secret-key: 6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe
+    site-key: ${RECAPTCHA_V3_SITE_KEY:6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI}
+    secret-key: ${RECAPTCHA_V3_SECRET_KEY:6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe}
     min-score: 0.5
   recaptcha-v2:
-    site-key: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
-    secret-key: 6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe
+    site-key: ${RECAPTCHA_V2_SITE_KEY:6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI}
+    secret-key: ${RECAPTCHA_V2_SECRET_KEY:6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe}
