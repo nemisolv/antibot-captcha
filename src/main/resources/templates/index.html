@@ -4,10 +4,18 @@
     <meta charset="UTF-8">
     <title>Captcha Verification</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center">
 
 <div class="w-full max-w-md bg-white rounded-2xl shadow-lg p-8">
+
+    <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">
+        Are you a robot?
+    </h1>
+
     <div th:if="${message}"
          th:text="${message}"
          th:class="${success}
@@ -15,36 +23,128 @@
         : 'mb-4 rounded-lg bg-red-100 text-red-700 px-4 py-3'">
     </div>
 
-    <h1 class="text-2xl font-bold text-center text-gray-800 mb-6">
-        🤖 Are you a robot?
-    </h1>
-
-    <div class="flex justify-center mb-6">
-        <img class="rounded-lg border border-gray-300"
-             th:src="${captchaChallenge.image}"
-             alt="Captcha">
+    <!-- Tab headers -->
+    <div class="grid grid-cols-4 gap-1 mb-6 bg-gray-100 rounded-lg p-1">
+        <button type="button" data-tab="demo"
+                class="tab-btn py-2 rounded-md text-sm font-semibold transition"
+                th:classappend="${activeTab == 'demo'} ? 'bg-white shadow text-blue-700' : 'text-gray-500'">
+            Demo
+        </button>
+        <button type="button" data-tab="turnstile"
+                class="tab-btn py-2 rounded-md text-sm font-semibold transition"
+                th:classappend="${activeTab == 'turnstile'} ? 'bg-white shadow text-blue-700' : 'text-gray-500'">
+            Turnstile
+        </button>
+        <button type="button" data-tab="recaptcha"
+                class="tab-btn py-2 rounded-md text-sm font-semibold transition"
+                th:classappend="${activeTab == 'recaptcha'} ? 'bg-white shadow text-blue-700' : 'text-gray-500'">
+            reCAPTCHA v3
+        </button>
+        <button type="button" data-tab="recaptcha-v2"
+                class="tab-btn py-2 rounded-md text-sm font-semibold transition"
+                th:classappend="${activeTab == 'recaptcha-v2'} ? 'bg-white shadow text-blue-700' : 'text-gray-500'">
+            reCAPTCHA v2
+        </button>
     </div>
 
-    <form th:action="@{/verify}" method="post" class="space-y-4">
-        <input type="hidden"
-               name="captchaId"
-               th:value="${captchaChallenge.captchaId}">
-        <input
-                type="text"
-                name="answer"
-                placeholder="Enter the text above"
-                class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+    <!-- Demo tab (local image captcha) -->
+    <div class="tab-panel" id="tab-demo" th:classappend="${activeTab == 'demo'} ? '' : 'hidden'">
+        <div class="flex justify-center mb-6">
+            <img class="rounded-lg border border-gray-300"
+                 th:src="${captchaChallenge.image}"
+                 alt="Captcha">
+        </div>
 
-        <button
-                type="submit"
-                class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-200">
-            Verify
-        </button>
+        <form th:action="@{/demo/verify}" method="post" class="space-y-4">
+            <input type="hidden" name="captchaId" th:value="${captchaChallenge.captchaId}">
+            <input
+                    type="text"
+                    name="answer"
+                    placeholder="Enter the text above"
+                    class="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <button
+                    type="submit"
+                    class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-200">
+                Verify
+            </button>
+        </form>
+    </div>
 
-    </form>
+    <!-- Turnstile tab -->
+    <div class="tab-panel" id="tab-turnstile" th:classappend="${activeTab == 'turnstile'} ? '' : 'hidden'">
+        <form th:action="@{/turnstile/verify}" method="post" class="space-y-4">
+            <div class="cf-turnstile flex justify-center" th:attr="data-sitekey=${turnstileSiteKey}"></div>
+            <button
+                    type="submit"
+                    class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-200">
+                Verify
+            </button>
+        </form>
+    </div>
+
+    <!-- reCAPTCHA v3 tab (invisible, score-based) -->
+    <div class="tab-panel" id="tab-recaptcha" th:classappend="${activeTab == 'recaptcha'} ? '' : 'hidden'">
+        <p class="text-sm text-gray-500 mb-6 text-center">
+            reCAPTCHA v3 runs invisibly and scores this request when you click verify.
+        </p>
+        <form id="recaptcha-form" th:action="@{/recaptcha/verify}" method="post" class="space-y-4">
+            <input type="hidden" id="recaptcha-v3-response" name="g-recaptcha-response">
+            <button
+                    type="button"
+                    id="recaptcha-submit"
+                    th:attr="data-sitekey=${recaptchaSiteKey}"
+                    class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-200">
+                Verify
+            </button>
+        </form>
+    </div>
+
+    <!-- reCAPTCHA v2 tab (checkbox widget) -->
+    <div class="tab-panel" id="tab-recaptcha-v2" th:classappend="${activeTab == 'recaptcha-v2'} ? '' : 'hidden'">
+        <form th:action="@{/recaptcha-v2/verify}" method="post" class="space-y-4">
+            <div class="g-recaptcha flex justify-center" th:attr="data-sitekey=${recaptchaV2SiteKey}"></div>
+            <button
+                    type="submit"
+                    class="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-200">
+                Verify
+            </button>
+        </form>
+    </div>
 
 </div>
+
+<script>
+    document.querySelectorAll('.tab-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            var tab = btn.getAttribute('data-tab');
+
+            document.querySelectorAll('.tab-btn').forEach(function (b) {
+                b.classList.remove('bg-white', 'shadow', 'text-blue-700');
+                b.classList.add('text-gray-500');
+            });
+            btn.classList.add('bg-white', 'shadow', 'text-blue-700');
+            btn.classList.remove('text-gray-500');
+
+            document.querySelectorAll('.tab-panel').forEach(function (panel) {
+                panel.classList.toggle('hidden', panel.id !== 'tab-' + tab);
+            });
+        });
+    });
+
+    var recaptchaBtn = document.getElementById('recaptcha-submit');
+    if (recaptchaBtn) {
+        recaptchaBtn.addEventListener('click', function () {
+            var siteKey = recaptchaBtn.getAttribute('data-sitekey');
+            grecaptcha.ready(function () {
+                grecaptcha.execute(siteKey, {action: 'submit'}).then(function (token) {
+                    document.getElementById('recaptcha-v3-response').value = token;
+                    document.getElementById('recaptcha-form').submit();
+                });
+            });
+        });
+    }
+</script>
 
 </body>
 </html>

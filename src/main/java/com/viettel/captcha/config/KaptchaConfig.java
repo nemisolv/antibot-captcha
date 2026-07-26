@@ -32,7 +32,7 @@ public class KaptchaConfig {
                 "com.google.code.kaptcha.impl.DefaultNoise");
 
         props.put("kaptcha.obscurificator.impl",
-                "com.google.code.kaptcha.impl.WaterRipple");  // gợn sóng
+                "com.google.code.kaptcha.impl.WaterRipple");
 
         props.put("kaptcha.background.clear.from", "255,255,255");
         props.put("kaptcha.background.clear.to", "255,255,255");

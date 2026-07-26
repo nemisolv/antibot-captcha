@@ -18,7 +18,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
 @Service
-@EnableScheduling  // only active in this class
+@EnableScheduling
 public class LocalCacheCleanupNaiveCaptchaServiceImpl implements NaiveCaptchaService {
 
     private static final Logger log = LoggerFactory.getLogger(LocalCacheCleanupNaiveCaptchaServiceImpl.class);
@@ -67,34 +67,15 @@ public class LocalCacheCleanupNaiveCaptchaServiceImpl implements NaiveCaptchaSer
 
     @Scheduled(fixedDelay = 60000)
     public void cleanup() {
-
         long now = System.currentTimeMillis();
-
-        Iterator<Map.Entry<String, CaptchaInfo>> iterator =
-                cache.entrySet().iterator();
-        log.info("Cache size before cleanup: {}", cache.size());
+        Iterator<Map.Entry<String, CaptchaInfo>> iterator = cache.entrySet().iterator();
         while (iterator.hasNext()) {
-
             Map.Entry<String, CaptchaInfo> entry = iterator.next();
-
             if (entry.getValue().expireAt() <= now) {
-
-                log.info("Remove expired captcha: {} --> {}", entry.getKey(), entry.getValue());
-
+                log.info("Removing expired captcha: {} -> {}", entry.getKey(), entry.getValue());
                 iterator.remove();
             }
         }
-        log.info("Cache size after cleanup: {}", cache.size());
-
     }
-//    public void cleanup() {
-//
-//        long now = System.currentTimeMillis();
-//
-//        cache.entrySet().removeIf(
-//                e -> e.getValue().expireAt() <= now
-//        );
-//    }
-
 
 }

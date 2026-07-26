@@ -1,8 +1,26 @@
 server:
   port: 8087
+  servlet:
+    session:
+      tracking-modes: cookie
 spring:
+  config:
+    import: optional:application-secrets.yaml
   application:
     name: captcha
 
   thymeleaf:
     cache: false
+# Default keys below are the public always-pass test pairs from Cloudflare/Google docs.
+# Real keys go in application-secrets.yaml (git-ignored), which overrides these locally.
+captcha:
+  turnstile:
+    site-key: 1x00000000000000000000AA
+    secret-key: 1x0000000000000000000000000000000AA
+  recaptcha:
+    site-key: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
+    secret-key: 6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe
+    min-score: 0.5
+  recaptcha-v2:
+    site-key: 6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI
+    secret-key: 6LeIxAcTAAAAAGG-vFI1TnRWxMZNFuojJ4WifJWe
